@@ -1,10 +1,10 @@
 
 
 
-CREATE DATABASE alpsem4;
+CREATE DATABASE JokiGamingDatabase;
 
 
-USE alpsem4;
+USE JokiGamingDatabase;
 
 
 drop table if exists `user`;
@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS transaksi (
     harga int NOT NULL,
     deskripsi varchar (100),
     statusbyr varchar (1) NOT NULL DEFAULT 'F',
+    statustrans varchar (1) NOT NULL DEFAULT 'F',
     statusdel varchar(1) NOT NULL DEFAULT 'F'
 );
 
@@ -267,4 +268,11 @@ INSERT INTO wishlist (ID_wishlist,ID_user,ID_catalog, harga) VALUES
 ('W0024','U0009', 'L0006', 110000),
 ('W0025','U0010', 'L0014', 140000);
 
-
+-- select u.ID_user, u.username, count(t.ID_transaksi) as jumlah_pesanan
+-- from transaksi t
+-- join`user` u 
+-- on t.ID_user = u.ID_user
+-- where u.user_role = 'Joki'
+-- group by u.ID_user, u.username
+-- order by jumlah_pesanan desc
+-- limit 1;
