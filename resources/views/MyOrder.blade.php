@@ -46,6 +46,30 @@
             background-color: #FFC400;
             border-color: #FFC400;
         }
+        
+            .quick-access {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        gap: 30px; /* Adjust the gap between links as needed */
+    }
+
+    .quick-access li::before {
+        content: '•';
+        margin-right: 8px; /* Adjust the space between the bullet and the link */
+        color: white; /* Set the color of the bullet */
+    }
+
+    .quick-access li {
+        display: inline;
+    }
+
+    .quick-access a {
+        text-decoration: none;
+        color: inherit; /* Ensure the link color matches the text color */
+    }
+    
     </style>
 </head>
 
@@ -158,12 +182,13 @@
                         <th>Nama Produk</th>
                         <th>Price</th>
                         <th>Deskripsi</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody class="align-middle">
                     @if($catalogItems->isEmpty())
                         <tr>
-                            <td colspan="4" class="align-middle">No orders</td>
+                            <td colspan="6" class="align-middle">No orders</td>
                         </tr>
                     @else
                         @foreach($catalogItems as $item)
@@ -175,6 +200,17 @@
                                 <td class="align-middle">{{ $item->product_name }}</td>
                                 <td class="align-middle">Rp {{ number_format($item->transaksi_harga, 0, ',', '.') }}</td>
                                 <td class="align-middle">{{ $item->transaksi_deskripsi }}</td>
+                                <td class="align-middle">
+                                    @if($item->statustrans == 'F')
+                                        <form action="{{ route('updateStatus', $item->ID_transaksi) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-success">Selesai</button>
+                                        </form>
+                                    @else
+                                        Sudah Selesai
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     @endif
@@ -183,7 +219,11 @@
         </div>
     </div>
 </div>
-<div class="container-fluid bg-dark text-secondary mt-5 pt-5">
+<div class="pagination justify-content-center">
+    {{ $catalogItems->links() }}
+</div>
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-secondary mt-5 pt-5">
         <div class="row px-xl-5 pt-5">
             <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
                 <h5 class="text-secondary text-uppercase mb-4">Get In Touch</h5>
@@ -192,18 +232,17 @@
             <div class="col-lg-8 col-md-12">
                 <div class="row">
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-secondary text-uppercase mb-4">Quick Shop</h5>
-                        <div class="d-flex flex-column justify-content-start">
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shop Detail</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
-                            <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
+                    <h5 class="text-secondary text-uppercase mb-4">Quick Access</h5>
+<ul class="quick-access">
+    <li><a class="text-secondary" href="{{ route('homepage') }}">Home</a></li>
+    <li><a class="text-secondary" href="{{ route('shop') }}">Shop</a></li>
+    <li><a class="text-secondary" href="{{ route('About') }}">About</a></li>
+    <li><a class="text-secondary" href="{{ route('faq') }}">FAQ</a></li>
+</ul>
+
                     </div>
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
+                        <!-- <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
                         <div class="d-flex flex-column justify-content-start">
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
@@ -211,12 +250,12 @@
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
                             <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-md-4 mb-5">
                         <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
-                        <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
-                        <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
+                        <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>jokigaming@email.com</p>
+                        <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+62 8123773546</p>
                     </div> 
                 </div>
             </div>
@@ -229,9 +268,9 @@
                     <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
                 </p>
             </div>
-            <div class="col-md-6 px-xl-0 text-center text-md-right">
+            <!-- <div class="col-md-6 px-xl-0 text-center text-md-right">
                 <img class="img-fluid" src="img/payments.png" alt="">
-            </div>
+            </div> -->
         </div>
     </div>
     <!-- Footer End -->

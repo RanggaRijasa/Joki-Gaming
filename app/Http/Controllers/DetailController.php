@@ -12,9 +12,17 @@ class DetailController extends Controller
     {
         $product = Catalog::where('ID_catalog', $id_catalog)->first();
         $reviews = Review::where('ID_catalog', $id_catalog)->with('user')->get();
+        $averageRating = $reviews->avg('rating');
+
+        // Check if the logged-in user has reviewed the product
+        $loggedInUserId = Session::get('loggedInUserId');
+        $userHasReviewed = false;
+        if ($loggedInUserId) {
+            $userHasReviewed = $reviews->where('ID_user', $loggedInUserId)->isNotEmpty();
+        }
 
         if ($product) {
-            return view('detail', compact('product', 'reviews'));
+            return view('detail', compact('product', 'reviews', 'averageRating', 'userHasReviewed'));
         } else {
             abort(404);
         }

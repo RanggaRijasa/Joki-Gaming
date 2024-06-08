@@ -24,6 +24,30 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <style>
+            .quick-access {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        gap: 30px; /* Adjust the gap between links as needed */
+    }
+
+    .quick-access li::before {
+        content: '•';
+        margin-right: 8px; /* Adjust the space between the bullet and the link */
+        color: white; /* Set the color of the bullet */
+    }
+
+    .quick-access li {
+        display: inline;
+    }
+
+    .quick-access a {
+        text-decoration: none;
+        color: inherit; /* Ensure the link color matches the text color */
+    }
+    </style>
 </head>
 
 <body>
@@ -190,17 +214,17 @@
                         <div class="navbar-nav mr-auto py-0">
                             <a href="{{ route('homepage') }}" class="nav-item nav-link">Home</a>
                             <a href="{{ route('shop') }}" class="nav-item nav-link">Shop</a>
-                            <a href="{{ route('cart') }}" class="nav-item nav-link">Shopping Cart</a>
-                            <a href="{{ route('wishlist') }}" class="nav-item nav-link">Wishlist</a>
-                            <a href="{{ route('checkout') }}" class="nav-item nav-link">Checkout</a>
-                            <!-- <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
-                                <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
-                                    <a href="cart.html" class="dropdown-item">Shopping Cart</a>
-                                    <a href="checkout.html" class="dropdown-item">Checkout</a>
-                                </div>
-                            </div> -->
-                            <a href="{{ route('contacts') }}" class="nav-item nav-link active">My Transaction</a>
+                            @if(Session::get('last_logged_in_username') === null)
+                            <a href="{{ route('login') }}" class="nav-item nav-link">Shopping Cart</a>
+                            <a href="{{ route('login') }}" class="nav-item nav-link ">Wishlist</a>
+                            <a href="{{ route('login') }}" class="nav-item nav-link">Checkout</a>
+                            <a href="{{ route('login') }}" class="nav-item nav-link">My Transaction</a>
+@else
+<a href="{{ route('cart') }}" class="nav-item nav-link">Shopping Cart</a>
+<a href="{{ route('wishlist') }}" class="nav-item nav-link  ">Wishlist</a>
+<a href="{{ route('checkout') }}" class="nav-item nav-link">Checkout</a>
+<a href="{{ route('contacts') }}" class="nav-item nav-link active">My Transaction</a>
+@endif
                         </div>
                     </div>
                 </nav>
@@ -214,42 +238,50 @@
     <!-- Contact Start -->
     <div class="container-fluid">
     <div class="container-fluid">
-    <div class="row px-xl-5 justify-content-center">
-        <div class="col-lg-8 table-responsive mb-5">
-            <table class="table table-light table-borderless table-hover text-center mb-0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>IMG</th>
-                        <th>Nama produk </th>
-                        <th>Price</th>
-                        <th>Deskripsi</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody class="align-middle">
-                @forelse($transaksiItems as $item)
-    @if($item->statusdel == false)
-        <tr>
-            <td class="align-middle">
-                <img src="{{ asset('img/' . $item->imgproduct) }}" alt="" style="width: 50px;"> 
-            </td>
-            <td class="align-middle"> {{ $item->product_name }}</td>
-            <td class="align-middle">Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
-            <td class="align-middle"> {{ $item->deskripsi }}</td>
-            <td class="align-middle">Payment Successful</td>
-        </tr>
-    @endif
-@empty
-    <tr>
-        <td colspan="3">No items in Transaction</td>
-    </tr>
-@endforelse
-                </tbody>
-            </table>
+        <div class="row px-xl-5 justify-content-center">
+            <div class="col-lg-8 table-responsive mb-5">
+                <table class="table table-light table-borderless table-hover text-center mb-0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>IMG</th>
+                            <th>Nama produk </th>
+                            <th>Price</th>
+                            <th>Deskripsi</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                    @forelse($transaksiItems as $item)
+                            <tr>
+                                <td class="align-middle">
+                                    <img src="{{ asset('img/' . $item->imgproduct) }}" alt="" style="width: 50px;"> 
+                                </td>
+                                <td class="align-middle"> {{ $item->product_name }}</td>
+                                <td class="align-middle">Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
+                                <td class="align-middle"> {{ $item->deskripsi }}</td>
+                                <td class="align-middle">
+                                    @if($item->statustrans == 'F')
+                                        Belum Diproses
+                                    @else
+                                        Sudah Selesai
+                                    @endif
+                                </td>
+                            </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5">No items in Transaction</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-    </div>
+<div class="pagination justify-content-center">
+    {{ $transaksiItems->links() }}
+</div>
+
     <!-- Contact End -->
 
 
@@ -263,18 +295,17 @@
             <div class="col-lg-8 col-md-12">
                 <div class="row">
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-secondary text-uppercase mb-4">Quick Shop</h5>
-                        <div class="d-flex flex-column justify-content-start">
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shop Detail</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
-                            <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
+                    <h5 class="text-secondary text-uppercase mb-4">Quick Access</h5>
+<ul class="quick-access">
+    <li><a class="text-secondary" href="{{ route('homepage') }}">Home</a></li>
+    <li><a class="text-secondary" href="{{ route('shop') }}">Shop</a></li>
+    <li><a class="text-secondary" href="{{ route('About') }}">About</a></li>
+    <li><a class="text-secondary" href="{{ route('faq') }}">FAQ</a></li>
+</ul>
+
                     </div>
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
+                        <!-- <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
                         <div class="d-flex flex-column justify-content-start">
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
@@ -282,12 +313,12 @@
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
                             <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-md-4 mb-5">
                         <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
-                        <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
-                        <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
+                        <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>jokigaming@email.com</p>
+                        <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+62 8123773546</p>
                     </div> 
                 </div>
             </div>
@@ -300,9 +331,9 @@
                     <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
                 </p>
             </div>
-            <div class="col-md-6 px-xl-0 text-center text-md-right">
+            <!-- <div class="col-md-6 px-xl-0 text-center text-md-right">
                 <img class="img-fluid" src="img/payments.png" alt="">
-            </div>
+            </div> -->
         </div>
     </div>
     <!-- Footer End -->

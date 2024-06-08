@@ -70,10 +70,11 @@ Route::get('/selleraddprod', [SellerAddProductController::class, 'show'])->name(
 Route::get('/wishlist', [WishlistController::class, 'show'])->name('wishlist');
 
     Route::post('/usrlogin/login', [AuthController::class, 'login']);
-    
+    Route::put('/myorder/updateStatus/{id}', [MyOrderController::class, 'updateStatus'])->name('updateStatus');
     // web.php
     Route::post('/logout', function () {
         Auth::logout();
+        Session::flush();
         \Log::info('User logged out'); // Tambahkan log ini
         return redirect('/usrlogin');
     })->name('logout');

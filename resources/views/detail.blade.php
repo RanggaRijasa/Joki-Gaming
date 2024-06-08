@@ -45,6 +45,30 @@
 .star-rating input[type="radio"]:checked ~ label {
     color: #ffc700;
 }
+
+            .quick-access {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        gap: 30px; /* Adjust the gap between links as needed */
+    }
+
+    .quick-access li::before {
+        content: '•';
+        margin-right: 8px; /* Adjust the space between the bullet and the link */
+        color: white; /* Set the color of the bullet */
+    }
+
+    .quick-access li {
+        display: inline;
+    }
+
+    .quick-access a {
+        text-decoration: none;
+        color: inherit; /* Ensure the link color matches the text color */
+    }
+    
 </style>
 </head>
 
@@ -210,18 +234,17 @@
 
               
                  
-
-                            <a href="{{ route('cart') }}" class="nav-item nav-link">Shopping Cart</a>
-                            <a href="{{ route('wishlist') }}" class="nav-item nav-link">Wishlist</a>
-                            <a href="{{ route('checkout') }}" class="nav-item nav-link">Checkout</a>
-                            <!-- <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
-                                <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
-                                    <a href="cart.html" class="dropdown-item">Shopping Cart</a>
-                                    <a href="checkout.html" class="dropdown-item">Checkout</a>
-                                </div>
-                            </div> -->
-                            <a href="{{ route('contacts') }}" class="nav-item nav-link">My Transaction</a>
+                            @if(Session::get('last_logged_in_username') === null)
+                            <a href="{{ route('login') }}" class="nav-item nav-link">Shopping Cart</a>
+                            <a href="{{ route('login') }}" class="nav-item nav-link">Wishlist</a>
+                            <a href="{{ route('login') }}" class="nav-item nav-link">Checkout</a>
+                            <a href="{{ route('login') }}" class="nav-item nav-link">My Transaction</a>
+@else
+<a href="{{ route('cart') }}" class="nav-item nav-link">Shopping Cart</a>
+<a href="{{ route('wishlist') }}" class="nav-item nav-link">Wishlist</a>
+<a href="{{ route('checkout') }}" class="nav-item nav-link">Checkout</a>
+<a href="{{ route('contacts') }}" class="nav-item nav-link">My Transaction</a>
+@endif
                         </div>
                     </div>
                 </nav>
@@ -273,6 +296,21 @@
         <div class="bg-light p-30">
             <div class="nav nav-tabs mb-4">
                 <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-3">Reviews</a>
+                <!-- Display the average rating -->
+                @if ($averageRating)
+                    <div class="text-primary ml-2 mt-2">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= $averageRating)
+                                <i class="fas fa-star"></i>
+                            @elseif ($i <= ceil($averageRating))
+                                <i class="fas fa-star-half-alt"></i>
+                            @else
+                                <i class="far fa-star"></i>
+                            @endif
+                        @endfor
+                        <span class="ml-2">({{ number_format($averageRating, 1) }} / 5)</span>
+                    </div>
+                @endif
             </div>
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="tab-pane-3">
@@ -299,28 +337,32 @@
                             @endforeach
                         </div>
                         <div class="col-md-6">
-                            <h4 class="mb-4">Leave a review</h4>
-                            <small>Your email address will not be published. Required fields are marked *</small>
-                            <form action="{{ route('addReview', ['id_catalog' => $product->ID_catalog]) }}" method="POST">
-                                @csrf
-                                <div class="d-flex my-3">
-                                    <p class="mb-0 mr-2">Your Rating * :</p>
-                                    <div class="text-primary star-rating">
-                                        <input type="radio" name="rating" id="star5" value="5"><label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
-                                        <input type="radio" name="rating" id="star4" value="4"><label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
-                                        <input type="radio" name="rating" id="star3" value="3"><label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
-                                        <input type="radio" name="rating" id="star2" value="2"><label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
-                                        <input type="radio" name="rating" id="star1" value="1"><label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                            @if ($userHasReviewed)
+                                <h4 class="mb-4">Thank You for your Review</h4>
+                            @else
+                                <h4 class="mb-4">Leave a review</h4>
+                                <small>Your email address will not be published. Required fields are marked *</small>
+                                <form action="{{ route('addReview', ['id_catalog' => $product->ID_catalog]) }}" method="POST">
+                                    @csrf
+                                    <div class="d-flex my-3">
+                                        <p class="mb-0 mr-2">Your Rating * :</p>
+                                        <div class="text-primary star-rating">
+                                            <input type="radio" name="rating" id="star5" value="5"><label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                                            <input type="radio" name="rating" id="star4" value="4"><label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+                                            <input type="radio" name="rating" id="star3" value="3"><label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+                                            <input type="radio" name="rating" id="star2" value="2"><label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+                                            <input type="radio" name="rating" id="star1" value="1"><label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="review_text">Your Review *</label>
-                                    <textarea id="review_text" name="review_text" cols="30" rows="5" class="form-control" required></textarea>
-                                </div>
-                                <div class="form-group mb-0">
-                                    <input type="submit" value="Leave Your Review" class="btn btn-primary px-3">
-                                </div>
-                            </form>
+                                    <div class="form-group">
+                                        <label for="review_text">Your Review *</label>
+                                        <textarea id="review_text" name="review_text" cols="30" rows="5" class="form-control" required></textarea>
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <input type="submit" value="Leave Your Review" class="btn btn-primary px-3">
+                                    </div>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -346,18 +388,17 @@
             <div class="col-lg-8 col-md-12">
                 <div class="row">
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-secondary text-uppercase mb-4">Quick Shop</h5>
-                        <div class="d-flex flex-column justify-content-start">
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shop Detail</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
-                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
-                            <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
+                    <h5 class="text-secondary text-uppercase mb-4">Quick Access</h5>
+<ul class="quick-access">
+    <li><a class="text-secondary" href="{{ route('homepage') }}">Home</a></li>
+    <li><a class="text-secondary" href="{{ route('shop') }}">Shop</a></li>
+    <li><a class="text-secondary" href="{{ route('About') }}">About</a></li>
+    <li><a class="text-secondary" href="{{ route('faq') }}">FAQ</a></li>
+</ul>
+
                     </div>
                     <div class="col-md-4 mb-5">
-                        <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
+                        <!-- <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
                         <div class="d-flex flex-column justify-content-start">
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
@@ -365,12 +406,12 @@
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
                             <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
                             <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-md-4 mb-5">
                         <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
-                        <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
-                        <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
+                        <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>jokigaming@email.com</p>
+                        <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+62 8123773546</p>
                     </div> 
                 </div>
             </div>
@@ -383,9 +424,9 @@
                     <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
                 </p>
             </div>
-            <div class="col-md-6 px-xl-0 text-center text-md-right">
+            <!-- <div class="col-md-6 px-xl-0 text-center text-md-right">
                 <img class="img-fluid" src="img/payments.png" alt="">
-            </div>
+            </div> -->
         </div>
     </div>
     <!-- Footer End -->
